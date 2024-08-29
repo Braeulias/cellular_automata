@@ -12,8 +12,6 @@ struct Dropdown {
     size: Vec2,
 }
 
-
-
 impl Dropdown {
     fn new(position: Vec2, size: Vec2, options: Vec<&'static str>) -> Self {
         Dropdown {
@@ -28,7 +26,13 @@ impl Dropdown {
     fn draw(&mut self) {
         // Draw the dropdown button
         let button_color = if self.is_open { LIGHTGRAY } else { GRAY };
-        draw_rectangle(self.position.x, self.position.y, self.size.x, self.size.y, button_color);
+        draw_rectangle(
+            self.position.x,
+            self.position.y,
+            self.size.x,
+            self.size.y,
+            button_color,
+        );
 
         let selected_option = self.options[self.selected_index];
         let text_dimensions = measure_text(selected_option, None, 20, 1.0);
@@ -101,14 +105,13 @@ enum RuleSet {
     GameOfLife,
     HighLife,
     BriansBrain,
-    Seeded,   // New rule set
-    DayNight, // New rule set
-    MorleysGarden, // New rule set
+    Seeded,
+    DayNight,
+    MorleysGarden,
     Diffusion,
     SierpinskiTriangle,
     Custom(String),
 }
-
 
 impl RuleSet {
     fn update_grid(&self, grid: &mut Grid) {
@@ -126,8 +129,6 @@ impl RuleSet {
     }
 }
 
-
-
 struct Grid {
     cells: [[bool; WIDTH]; HEIGHT],
 }
@@ -135,7 +136,7 @@ struct Grid {
 impl Grid {
     fn new() -> Self {
         Grid {
-            cells: [[false; WIDTH]; HEIGHT]
+            cells: [[false; WIDTH]; HEIGHT],
         }
     }
 
@@ -152,11 +153,7 @@ impl Grid {
         // Draw each cell
         for y in 0..HEIGHT {
             for x in 0..WIDTH {
-                let cell_color = if self.cells[y][x] {
-                    BLACK
-                } else {
-                    WHITE
-                };
+                let cell_color = if self.cells[y][x] { BLACK } else { WHITE };
 
                 // Draw the cell with the offset applied
                 draw_rectangle(
@@ -183,16 +180,13 @@ impl Grid {
         );
     }
 
-    fn toggle_cell(&mut self, x: usize,y: usize) {
-        self.cells[y][x] = true;
-    }
 
     fn update_conway(&mut self) {
         let mut new_cells = [[false; WIDTH]; HEIGHT];
 
         for y in 0..HEIGHT {
             for x in 0..WIDTH {
-                let live_neighbours = self.count_live_neighbours(x,y);
+                let live_neighbours = self.count_live_neighbours(x, y);
 
                 new_cells[y][x] = match (self.cells[y][x], live_neighbours) {
                     (true, 2) | (_, 3) => true,
@@ -209,7 +203,7 @@ impl Grid {
 
         for y in 0..HEIGHT {
             for x in 0..WIDTH {
-                let live_neighbours = self.count_live_neighbours(x,y);
+                let live_neighbours = self.count_live_neighbours(x, y);
 
                 new_cells[y][x] = match (self.cells[y][x], live_neighbours) {
                     (_, 3) | (_, 6) | (true, 2) => true,
@@ -237,8 +231,6 @@ impl Grid {
         self.cells = new_cells;
     }
 
-
-
     fn update_seeded(&mut self) {
         let mut new_cells = [[false; WIDTH]; HEIGHT];
 
@@ -246,7 +238,6 @@ impl Grid {
             for x in 0..WIDTH {
                 let live_neighbours = self.count_live_neighbours(x, y);
 
-                // Example rule: A cell becomes alive if it has exactly 3 live neighbours
                 new_cells[y][x] = match (self.cells[y][x], live_neighbours) {
                     (_, 3) => true,
                     _ => false,
@@ -266,7 +257,7 @@ impl Grid {
 
                 new_cells[y][x] = match (self.cells[y][x], live_neighbours) {
                     (_, 3) | (_, 6) | (_, 7) | (_, 8) => true,
-                    (true, 2) | (true, 3) => true,
+                    (true, 2) => true,
                     _ => false,
                 };
             }
@@ -314,7 +305,7 @@ impl Grid {
                     }
                 }
 
-                new_cells[y][x] = live_neighbors >= 2; // Example threshold
+                new_cells[y][x] = live_neighbors >= 2;
             }
         }
 
@@ -327,7 +318,7 @@ impl Grid {
         for y in 0..HEIGHT {
             for x in 0..WIDTH {
                 if (x & y) == 0 {
-                    new_cells[y][x] = true; // This bitwise operation creates a Sierpiński triangle
+                    new_cells[y][x] = true;
                 }
             }
         }
@@ -338,8 +329,6 @@ impl Grid {
     fn update_custom(&mut self, custom_rule: &String) {
         // Implement custom rule logic here
     }
-
-
 
     fn count_live_neighbours(&self, x: usize, y: usize) -> usize {
         let mut count = 0;
@@ -444,7 +433,7 @@ async fn main() {
     let mut grid = Grid::new();
     let mut running = false;
     let mut step_forward = false;
-    let mut speed = 50.0; // Customize speed
+    let speed = 50.0; // Customize speed
 
     // Calculate the grid's position to center it
     let window_width = screen_width();
@@ -462,17 +451,14 @@ async fn main() {
             "HighLife",
             "Brian's Brain",
             "Seeded",
-            "Day & Night",   // New option
-            "Morley's Garden", // New option
+            "Day & Night",
+            "Morley's Garden",
             "Diffusion",
             "Sierpinski Triangle",
         ],
     );
 
-
-
     let mut selected_ruleset = RuleSet::GameOfLife;
-    let mut custom_rule = String::new();
 
     loop {
         clear_background(WHITE);
@@ -507,8 +493,6 @@ async fn main() {
             "Sierpinski Triangle" => selected_ruleset = RuleSet::SierpinskiTriangle,
             _ => {}
         }
-
-
 
         draw_keybinds();
 
